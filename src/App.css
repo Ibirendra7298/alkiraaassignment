@@ -1,38 +1,85 @@
 .App {
-  text-align: center;
+  background-color: #ffffff;
+  position: absolute;
+  width: 1728px;
+  height: 1117px;
+  left: 0px;
+  top: 0px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
+.header {
+  position: absolute;
+  width: 630px;
+  height: 64px;
+  left: 170px;
+  top: 49px;
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 56px;
+  /* or 117% */
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+
+  color: #074684;
 }
 
-.App-link {
-  color: #61dafb;
+.search-box {
+  box-sizing: border-box;
+
+  position: absolute;
+  width: 750px;
+  height: 50px;
+  left: 170px;
+  top: 152px;
+
+  background: #FFFFFF;
+  border: 2px solid #074684;
+  border-radius: 10px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.search-icon {
+  height: 50px;
+  width: 50px;
+  position: absolute;
+  left: 925px;
+  top: 152px;
+
+  border: 2px solid #074684;
+  border-radius: 10px;
+
+  /* 00. On Surface / High Emphasis */
+
+}
+
+.table {
+  width: 500px;
+  position: absolute;
+  left: 170px;
+  top: 240px;
+}
+
+.table-header {
+  background: #074684;
+  border-radius: 5px;
+  color: #ffffff;
+}
+
+.sidebar-title{
+  background: #a5c3e0;
+}
+
+.sidebar-body{
+  font-size: 18px;
+  font-family: 'Roboto';
+}
+.selected-item{
+  background: #a5c3e0;
+}
+.team-game-detail{
+  margin-top: 20px;
+  font-weight: 600;
 }
