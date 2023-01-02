@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Table, Row, Col } from 'react-bootstrap';
+import { Table, Row, Col, Pagination } from 'react-bootstrap';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import { AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineSearch} from "react-icons/ai";
+import {TiArrowSortedDown, TiArrowSortedUp} from "react-icons/ti"
 
 export default function NBATeam() {
 
@@ -13,6 +14,42 @@ export default function NBATeam() {
     const [show, setShow] = useState(false);
     const [selectedTeamColorFlag, setSelectedTeamColorFlag] = useState(0);
     const [inputText, setInputText] = useState("")
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1
+    });
+    const [sortOrder, setSortOrder] = useState('asc');
+
+    const handlePageChange = (page) => {
+        if (pagination.currentPage < pagination.totalPages) {
+            setPagination({ ...pagination, currentPage: page });
+        }
+    }
+
+
+    const handleSortingByName = () => {
+        const sortedTeams = [...teams].sort((a, b) => {
+            if (sortOrder === 'asc') {
+                return a.name.localeCompare(b.name);
+            } else {
+                return b.name.localeCompare(a.name);
+            }
+        });
+        setTeams(sortedTeams);
+        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    }
+
+    const handleSortingByCity = () => {
+        const sortedTeams = [...teams].sort((a, b) => {
+            if (sortOrder === 'asc') {
+                return a.city.localeCompare(b.city);
+            } else {
+                return b.city.localeCompare(a.city);
+            }
+        });
+        setTeams(sortedTeams);
+        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    }
 
     const handleClose = () => {
         setShow(false);
@@ -23,8 +60,8 @@ export default function NBATeam() {
         setInputText(e.target.value);
     }
 
-    async function getTeams() {
-        const response = await fetch('https://www.balldontlie.io/api/v1/teams');
+    async function getTeams(page) {
+        const response = await fetch(`https://www.balldontlie.io/api/v1/teams?page=${page}`);
         const data = await response.json();
         return data;
     }
@@ -45,8 +82,14 @@ export default function NBATeam() {
     }
 
     useEffect(() => {
-        getTeams().then(data => setTeams(data.data));
-    }, []);
+        getTeams(pagination.currentPage).then(data => {
+            setTeams(data.data);
+            setPagination({
+                currentPage: data.meta.current_page,
+                totalPages: data.meta.total_pages
+            });
+        });
+    }, [pagination.currentPage]);
 
     return (
         <>
@@ -57,26 +100,35 @@ export default function NBATeam() {
             <Table striped bordered hover responsive size="sm" className='table'>
                 <thead className='table-header'>
                     <tr>
-                        <th>Team Name</th>
-                        <th>City</th>
+                        <th>Team Name  {sortOrder ==='asc'?<button onClick={handleSortingByName}><TiArrowSortedDown /></button>:<button onClick={handleSortingByName}><TiArrowSortedUp /></button>}</th>
+                        <th>City {sortOrder ==='asc'?<button onClick={handleSortingByCity}><TiArrowSortedDown /></button>:<button onClick={handleSortingByCity}><TiArrowSortedUp /></button>}</th>
                         <th>Abbreviation</th>
-                        <th>conference</th>
+                        <th>Conference</th>
                         <th>Division</th>
                     </tr>
                 </thead>
                 <tbody>
                     {teams.filter(item => item.name.toLowerCase().includes(inputText.toLowerCase()))
-                    .map(team => (
-                        <tr key={team.id} onClick={() => showTeamInfo(team)} className={(selectedTeamColorFlag && team.id === selectedTeam.id) ? "selected-item" : null}>
-                            <td>{team.name}</td>
-                            <td>{team.city}</td>
-                            <td>{team.abbreviation}</td>
-                            <td>{team.conference}</td>
-                            <td>{team.division}</td>
-                        </tr>
-                    ))}
+                        .map(team => (
+                            <tr key={team.id} onClick={() => showTeamInfo(team)} className={(selectedTeamColorFlag && team.id === selectedTeam.id) ? "selected-item" : null}>
+                                <td>{team.name}</td>
+                                <td>{team.city}</td>
+                                <td>{team.abbreviation}</td>
+                                <td>{team.conference}</td>
+                                <td>{team.division}</td>
+                            </tr>
+                        ))}
                 </tbody>
             </Table>
+
+            <Pagination className='pagination'>
+
+                <Pagination.Prev onClick={() => handlePageChange(pagination.currentPage - 1)} />
+                <Pagination.Item active>{pagination.currentPage}</Pagination.Item>
+                <Pagination.Item active>{pagination.totalPages}</Pagination.Item>
+                <Pagination.Next onClick={() => handlePageChange(pagination.currentPage + 1)} />
+
+            </Pagination>
 
             {teamGames.length !== 0 ? <Offcanvas show={show} onHide={handleClose} placement="end">
                 <Offcanvas.Header closeButton className='sidebar-title'>

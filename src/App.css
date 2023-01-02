@@ -83,3 +83,9 @@
   margin-top: 20px;
   font-weight: 600;
 }
+
+.pagination{
+  position: absolute;
+  left: 750px;
+  top: 1550px;
+}
