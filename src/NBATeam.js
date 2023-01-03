@@ -20,8 +20,14 @@ export default function NBATeam() {
     });
     const [sortOrder, setSortOrder] = useState('asc');
 
-    const handlePageChange = (page) => {
+    const handleNextPageChange = (page) => {
         if (pagination.currentPage < pagination.totalPages) {
+            setPagination({ ...pagination, currentPage: page });
+        }
+    }
+
+    const handlePrevPageChange = (page) => {
+        if (pagination.currentPage > 1) {
             setPagination({ ...pagination, currentPage: page });
         }
     }
@@ -60,8 +66,8 @@ export default function NBATeam() {
         setInputText(e.target.value);
     }
 
-    async function getTeams(page) {
-        const response = await fetch(`https://www.balldontlie.io/api/v1/teams?page=${page}`);
+    async function getTeams() {
+        const response = await fetch('https://www.balldontlie.io/api/v1/teams');
         const data = await response.json();
         return data;
     }
@@ -82,14 +88,14 @@ export default function NBATeam() {
     }
 
     useEffect(() => {
-        getTeams(pagination.currentPage).then(data => {
+        getTeams().then(data => {
             setTeams(data.data);
             setPagination({
-                currentPage: data.meta.current_page,
-                totalPages: data.meta.total_pages
+                currentPage: 1,
+                totalPages: (data.data.length)/5
             });
         });
-    }, [pagination.currentPage]);
+    }, []);
 
     return (
         <>
@@ -109,7 +115,9 @@ export default function NBATeam() {
                 </thead>
                 <tbody>
                     {teams.filter(item => item.name.toLowerCase().includes(inputText.toLowerCase()))
-                        .map(team => (
+                        .map(team => 
+                            {if(team.id >(pagination.currentPage-1)*5 && team.id <=pagination.currentPage*5)
+                                return (
                             <tr key={team.id} onClick={() => showTeamInfo(team)} className={(selectedTeamColorFlag && team.id === selectedTeam.id) ? "selected-item" : null}>
                                 <td>{team.name}</td>
                                 <td>{team.city}</td>
@@ -117,16 +125,16 @@ export default function NBATeam() {
                                 <td>{team.conference}</td>
                                 <td>{team.division}</td>
                             </tr>
-                        ))}
+                        )})}
                 </tbody>
             </Table>
 
             <Pagination className='pagination'>
 
-                <Pagination.Prev onClick={() => handlePageChange(pagination.currentPage - 1)} />
+                <Pagination.Prev onClick={() => handlePrevPageChange(pagination.currentPage - 1)} />
                 <Pagination.Item active>{pagination.currentPage}</Pagination.Item>
                 <Pagination.Item active>{pagination.totalPages}</Pagination.Item>
-                <Pagination.Next onClick={() => handlePageChange(pagination.currentPage + 1)} />
+                <Pagination.Next onClick={() => handleNextPageChange(pagination.currentPage + 1)} />
 
             </Pagination>
 
